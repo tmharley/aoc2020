@@ -21,7 +21,7 @@ def part_one(pwd_list)
     letter = data[3]
     pwd = data[4]
     num_occurrences = pwd.split('').select { |c| c == letter }.length
-    matched = num_occurrences >= min && num_occurrences <= max
+    matched = (min..max).include?(num_occurrences)
     correct += 1 if matched
   end
 
