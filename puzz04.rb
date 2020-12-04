@@ -85,6 +85,8 @@ def part_two(input)
   valid_passports
 end
 
+data = import_from_file('puzz04_input.txt')
+
 p part_one(TEST_INPUT) # should return 2
-p part_one(import_from_file('puzz04_input.txt'))
-p part_two(import_from_file('puzz04_input.txt'))
+p part_one(data)
+p part_two(data)
