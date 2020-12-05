@@ -49,11 +49,12 @@ def part_two(input)
   missing_seats.first
 end
 
+p 'Test outputs (should be 567, 119, 820):'
 TEST_INPUT.each do |test|
   p seat_id(test)
 end
 
 input = import_from_file('puzz05_input.txt')
 
-p part_one(input)
-p part_two(input)
+p "Part 1: #{part_one(input)}"
+p "Part 2: #{part_two(input)}"
