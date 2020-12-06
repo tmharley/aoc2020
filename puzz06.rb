@@ -18,7 +18,7 @@ TEST_INPUT = <<~INPUT
   b
 INPUT
 
-ALPHA_TO_INDEX = Hash[('a'..'z').to_a.zip((0..25).to_a)]
+ALPHA_TO_INDEX = Hash[('a'..'z').zip(0..25)]
 
 def import_from_file(filename)
   file = File.open(filename)
@@ -28,17 +28,17 @@ end
 def process_group(input)
   result = [false] * 26
   ('a'..'z').each do |letter|
-    result[ALPHA_TO_INDEX[letter]] = true if input.include?(letter)
+    result[ALPHA_TO_INDEX[letter]] ||= input.include?(letter)
   end
-  result.count { |found| found }
+  result.count(true)
 end
 
 def process_group_unanimous(input)
   lines = input.split("\n")
-  letters = lines.shift.split('')
+  letters = lines.shift.split('') # start with letters from first response
   lines.each do |line|
     letters.keep_if { |letter| line.include?(letter) }
-    break if letters.empty?
+    return 0 if letters.empty? # if none left, no need to process further
   end
   letters.size
 end
