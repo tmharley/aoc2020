@@ -25,6 +25,7 @@ end
 
 # @param color the color bag being searched for
 # @param rules array containing the list of individual bag rules
+# @return all potential outermost bags containing this bag
 def find_containing_bags(color, rules)
   allowed_colors = Set.new
   rules.map { |rule| rule.split('contain') }
@@ -37,6 +38,8 @@ def find_containing_bags(color, rules)
   allowed_colors
 end
 
+# @param text text representation of bag contents, e.g. "3 shiny gold bags"
+# @return array of individual contained bags, e.g. ['shiny gold', 'shiny gold', 'shiny gold']
 def multiple_bag_parse(text)
   text.chomp!
   return [] if text == 'no other bags'
@@ -46,6 +49,8 @@ def multiple_bag_parse(text)
   Array.new(quantity, color)
 end
 
+# @param rules_text the raw text of all rules in full
+# @return a hash matching each bag color with its direct contents
 def rules_to_hash(rules_text)
   rules_text.map { |rule| rule.split('contain') }
             .map do |rule_color, contents|
@@ -66,9 +71,8 @@ def part_two(color, input)
   bags_to_check += parsed_rules[color]
   total_bags += bags_to_check.length
   while bags_to_check.any?
-    new_bags = parsed_rules[bags_to_check.shift]
+    bags_to_check += (new_bags = parsed_rules[bags_to_check.shift])
     total_bags += new_bags.length
-    bags_to_check += new_bags
   end
   total_bags
 end
