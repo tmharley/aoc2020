@@ -64,6 +64,24 @@ def my_ticket(input)
   input.split("\n")[1].split(',').map(&:to_i)
 end
 
+def possible_orders(input)
+  fields = find_all_ranges(input[0])
+  nearby_tickets = expunge_invalid_tickets(input[2], fields)
+  possible_orders = []
+  fields.length.times do |i|
+    possibilities = fields.keys
+    nearby_tickets.each do |ticket|
+      value = ticket.split(',')[i].to_i
+      possibilities.each do |field|
+        valid = valid_for_field?(value, fields[field])
+        possibilities -= [field] unless valid
+      end
+    end
+    possible_orders << possibilities
+  end
+  possible_orders
+end
+
 def import_from_file(filename)
   file = File.open(filename)
   file.read
@@ -76,46 +94,20 @@ end
 
 def part_two(input)
   input_parts = input.split("\n\n")
-  fields = find_all_ranges(input_parts[0])
-  nearby_tickets = expunge_invalid_tickets(input_parts[2], fields)
-  possible_orders = []
-  fields.length.times do |i|
-    possibilities = fields.keys
-    nearby_tickets.each do |ticket|
-      value = ticket.split(',')[i].to_i
-      possibilities.each do |field|
-        valid = valid_for_field?(value, fields[field])
-        possibilities -= [field] unless valid
-      end
-    end
-    possible_orders << possibilities
-    # p possible_orders
-
-    # left_side = possible_orders[0]
-    # (1...possible_orders.length).each do |i|
-    #   right_side = possible_orders[i]
-    #   left_side = left_side.product(right_side)
-    #   left_side.reject! { |item| item.uniq.length < item.length }
-    # end
-    # p left_side
-  end
-
+  order = possible_orders(input_parts)
   uniques = []
-
   loop do
-    found_uniques = possible_orders.map { |po| po[0] if po.length == 1 }.compact!
+    found_uniques = order.map { |po| po[0] if po.length == 1 }.compact!
     break if found_uniques.nil?
 
     uniques += found_uniques
     uniques.each do |u|
-      possible_orders.map! { |po2| po2.length == 1 ? po2 : po2 - [u] }
+      order.map! { |po2| po2.length == 1 ? po2 : po2 - [u] }
       uniques -= [u]
     end
   end
-
   my_ticket = my_ticket(input_parts[1])
-
-  possible_orders.flatten!.map.with_index do |field, index|
+  order.flatten!.map.with_index do |field, index|
     field.start_with?('departure') ? my_ticket[index] : 1
   end.reduce(:*)
 end
