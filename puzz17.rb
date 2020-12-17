@@ -33,7 +33,9 @@ def neighbors(point, is4d: false)
       (z - 1..z + 1).each do |zz|
         if is4d
           (w - 1..w + 1).each do |ww|
-            set << [xx, yy, zz, ww] unless x == xx && y == yy && z == zz && w == ww
+            unless x == xx && y == yy && z == zz && w == ww
+              set << [xx, yy, zz, ww]
+            end
           end
         else
           set << [xx, yy, zz, 0] unless x == xx && y == yy && z == zz
@@ -71,7 +73,9 @@ def simulate(input, is4d: false)
             all_neighbors = neighbors(point, is4d: is4d)
             active_neighbors = all_neighbors & actives
             if active
-              new_actives.delete(point) unless (2..3).include?(active_neighbors.size)
+              unless (2..3).include?(active_neighbors.size)
+                new_actives.delete(point)
+              end
             elsif active_neighbors.size == 3
               new_actives << point
             end
