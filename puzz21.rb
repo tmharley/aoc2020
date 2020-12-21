@@ -38,14 +38,12 @@ def process(input)
     break if outstanding_allergens.empty?
 
     outstanding_allergens.each do |a|
-      # p "Looking for allergen #{a}"
       possible = Set.new
       dishes.each do |d|
         if d[:allergens].include?(a)
           possible.empty? ? possible += d[:ingredients] : possible &= d[:ingredients]
         end
         possible -= matches.values
-        # p "Possibilities: #{possible}"
         next if possible.size != 1
 
         matches[a] = possible.to_a[0]
