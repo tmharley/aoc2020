@@ -17,31 +17,35 @@ end
 def parse_input(input)
   dishes = input.split("\n")
   all_allergens = Set.new
-  stuff = dishes.map do |dish|
+  dishes = dishes.map do |dish|
     ingredients_list, allergens_list = dish.split(' (contains ')
-    h = { ingredients: Set.new, allergens: Set.new }
-    ingredients_list.split(' ').each { |i| h[:ingredients] << i }
+    dish = { ingredients: Set.new, allergens: Set.new }
+    ingredients_list.split(' ').each { |i| dish[:ingredients] << i }
     allergens_list[0...-1].split(', ').each do |a|
-      h[:allergens] << a
+      dish[:allergens] << a
       all_allergens << a
     end
-    h
+    dish
   end
-  [stuff, all_allergens]
+  [dishes, all_allergens]
 end
 
 def process(input)
   dishes, allergens = parse_input(input)
   matches = {}
   loop do
-    outstanding_allergens = allergens.reject { |a| matches.keys.include?(a) }
-    break if outstanding_allergens.empty?
+    allergens.reject! { |a| matches.keys.include?(a) }
+    break if allergens.empty?
 
-    outstanding_allergens.each do |a|
+    allergens.each do |a|
       possible = Set.new
-      dishes.each do |d|
-        if d[:allergens].include?(a)
-          possible.empty? ? possible += d[:ingredients] : possible &= d[:ingredients]
+      dishes.each do |dish|
+        if dish[:allergens].include?(a)
+          if possible.empty?
+            possible += dish[:ingredients]
+          else
+            possible &= dish[:ingredients]
+          end
         end
         possible -= matches.values
         next if possible.size != 1
@@ -51,10 +55,9 @@ def process(input)
       end
     end
   end
-  total = 0
-  dishes.each do |d|
-    total += d[:ingredients].reject { |i| matches.values.include?(i) }.length
-  end
+  total = dishes.map do |d|
+    d[:ingredients].reject { |i| matches.values.include?(i) }.length
+  end.reduce(&:+)
   [total, matches]
 end
 
